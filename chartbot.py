@@ -34,22 +34,19 @@ async def on_message(message):
             elif parts[1] == "M":
                 timeframe = "M"
 
-        # Auto-format crypto
+        # Auto-handle crypto symbols
         if ticker.endswith("USD") and not ticker.startswith("$"):
             ticker = f"${ticker}"
 
-        # Different URL settings
-        if timeframe == "D":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=D&yr=0&mn=6&dy=0&i=t375773&r=5000"
-            title = "Daily"
+        # Fill-the-chart URLs (no fixed time range)
+        chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r=7200"
 
-        elif timeframe == "W":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=5&i=t375773&r=5000"
+        if timeframe == "W":
             title = "Weekly"
-
-        else:
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=M&yr=10&i=t375773&r=5000"
+        elif timeframe == "M":
             title = "Monthly"
+        else:
+            title = "Daily"
 
         embed = discord.Embed(title=f"{ticker} Chart ({title})")
         embed.set_image(url=chart_url)
