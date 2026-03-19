@@ -20,8 +20,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    # Only respond to "$$"
-    if not message.content.lower().startswith("$$"):
+    if not message.content.startswith("$$"):
         return
 
     parts = message.content[2:].strip().upper().split()
@@ -30,27 +29,19 @@ async def on_message(message):
         return
 
     ticker = parts[0]
-
-    # Default timeframe
     timeframe = "D"
 
-    if len(parts) > 1:
-        if parts[1] == "W":
-            timeframe = "W"
-        elif parts[1] == "M":
-            timeframe = "M"
+    if len(parts) > 1 and parts[1] == "W":
+        timeframe = "W"
 
-    # Crypto formatting (BTCUSD etc)
+    # crypto formatting
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    # Chart URL
     chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r=7200"
 
     if timeframe == "W":
         title = "Weekly"
-    elif timeframe == "M":
-        title = "Monthly"
     else:
         title = "Daily"
 
