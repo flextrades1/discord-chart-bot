@@ -40,7 +40,15 @@ async def on_message(message):
 
     chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r=7200"
 
-    await message.channel.send(chart_url)
+    if timeframe == "W":
+        title = "Weekly"
+    else:
+        title = "Daily"
+
+    embed = discord.Embed(title=f"{ticker} Chart ({title})")
+    embed.set_image(url=chart_url)
+
+    await message.channel.send(embed=embed)
 
 
 client.run(TOKEN)
