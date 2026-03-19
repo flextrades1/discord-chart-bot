@@ -23,7 +23,6 @@ async def on_message(message):
     if message.content.startswith("$$"):
 
         parts = message.content.replace("$$", "").strip().upper().split()
-
         ticker = parts[0]
 
         timeframe = "D"
@@ -34,7 +33,7 @@ async def on_message(message):
             elif parts[1] == "M":
                 timeframe = "M"
 
-        # Handle crypto automatically
+        # Auto format crypto
         if ticker.endswith("USD") and not ticker.startswith("$"):
             ticker = f"${ticker}"
 
@@ -43,7 +42,7 @@ async def on_message(message):
             title = "Daily"
 
         elif timeframe == "W":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=2&mn=0&dy=0&i=t375773&r=7200"
+            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=2&i=t375773&r=7200"
             title = "Weekly"
 
         else:
