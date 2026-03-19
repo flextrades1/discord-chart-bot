@@ -43,7 +43,7 @@ async def on_message(message):
             title = "Daily"
 
         elif timeframe == "W":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=2&i=t375773&r=7200"
+            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=2&mn=0&dy=0&i=t375773&r=7200"
             title = "Weekly"
 
         else:
