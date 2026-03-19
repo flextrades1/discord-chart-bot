@@ -41,7 +41,7 @@ async def on_message(message):
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={__import__('time').time()}"
+    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe.lower()}&i=t375773&r={__import__('time').time()}"
 
     if timeframe == "W":
         title = "Weekly"
