@@ -38,9 +38,13 @@ async def on_message(message):
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    chart_url = f"https://stockcharts.com/h-sc/ui?s={ticker}&p={timeframe}"
+    # reliability fix (unique URL every request)
+    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={__import__('time').time()}"
 
-    title = "Weekly" if timeframe == "W" else "Daily"
+    if timeframe == "W":
+        title = "Weekly"
+    else:
+        title = "Daily"
 
     embed = discord.Embed(title=f"{ticker} Chart ({title})")
     embed.set_image(url=chart_url)
