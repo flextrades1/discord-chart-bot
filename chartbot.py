@@ -1,58 +1,48 @@
-import discord
-import os
+import 'dotenv/config'
+import { Client, GatewayIntentBits } from 'discord.js'
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+})
 
-intents = discord.Intents.default()
-intents.message_content = True
+client.once('ready', () => {
+  console.log(`Logged in as ${client.user.tag}`)
+})
 
-client = discord.Client(intents=intents)
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return
 
+  const content = message.content.trim()
 
-@client.event
-async def on_ready():
-    print("Bot is online!")
+  // MONTHLY — fill chart
+  if (content.startsWith('$$$')) {
+    const ticker = content.replace('$$$', '').trim().toUpperCase()
+    if (!ticker) return
 
+    const chart = `https://stockcharts.com/c-sc/sc?s=${ticker}&p=M&yr=0&mn=0&dy=0&i=t8023489382c&r=`
+    message.channel.send(chart)
+    return
+  }
 
-@client.event
-async def on_message(message):
+  // WEEKLY — 18 months
+  if (content.startsWith('$$')) {
+    const ticker = content.replace('$$', '').trim().toUpperCase()
+    if (!ticker) return
 
-    if message.author == client.user:
-        return
+    const chart = `https://stockcharts.com/c-sc/sc?s=${ticker}&p=W&yr=1&mn=6&dy=0&i=t8023489382c&r=`
+    message.channel.send(chart)
+    return
+  }
 
-    if message.content.startswith("$$"):
+  // DAILY — fill chart
+  if (content.startsWith('$')) {
+    const ticker = content.replace('$', '').trim().toUpperCase()
+    if (!ticker) return
 
-        parts = message.content.replace("$$", "").strip().upper().split()
-        ticker = parts[0]
+    const chart = `https://stockcharts.com/c-sc/sc?s=${ticker}&p=D&yr=0&mn=0&dy=0&i=t8023489382c&r=`
+    message.channel.send(chart)
+    return
+  }
+})
 
-        timeframe = "d"
-
-        if len(parts) > 1:
-            if parts[1] == "W":
-                timeframe = "w"
-            elif parts[1] == "M":
-                timeframe = "m"
-
-        # Auto-format crypto
-        if ticker.endswith("USD") and not ticker.startswith("$"):
-            ticker = f"${ticker}"
-
-        if timeframe == "d":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=d&i=t375773&r=7200"
-            title = "Daily"
-
-        elif timeframe == "w":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=w&yr=2&i=t375773&r=7200"
-            title = "Weekly"
-
-        else:
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=m&i=t375773&r=7200"
-            title = "Monthly"
-
-        embed = discord.Embed(title=f"{ticker} Chart ({title})")
-        embed.set_image(url=chart_url)
-
-        await message.channel.send(embed=embed)
-
-
-client.run(TOKEN)
+client.login(process.env.DISCORD_TOKEN)
