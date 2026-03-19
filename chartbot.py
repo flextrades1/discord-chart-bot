@@ -31,12 +31,17 @@ async def on_message(message):
     ticker = parts[0]
     timeframe = "D"
 
+    # Weekly option
     if len(parts) > 1 and parts[1] == "W":
         timeframe = "W"
 
-    # crypto formatting
+    # Crypto formatting
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
+
+    # If no exchange specified, default to NYSE
+    if ":" not in ticker and not ticker.startswith("$"):
+        ticker = f"{ticker}:NYSE"
 
     chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r=7200"
 
