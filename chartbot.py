@@ -1,6 +1,5 @@
 import discord
 import os
-import time
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -39,17 +38,14 @@ async def on_message(message):
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    # cache-buster so Discord refreshes the image
-    ts = int(time.time())
-
-    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={ts}"
+    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r=7200"
 
     title = "Weekly" if timeframe == "W" else "Daily"
 
     embed = discord.Embed(title=f"{ticker} Chart ({title})")
     embed.set_image(url=chart_url)
 
-    await message.channel.send(embed=embed)
+    await message.channel.send(embed=embed, suppress_embeds=True)
 
 
 client.run(TOKEN)
