@@ -25,28 +25,28 @@ async def on_message(message):
         parts = message.content.replace("$$", "").strip().upper().split()
         ticker = parts[0]
 
-        timeframe = "D"
+        timeframe = "d"
 
         if len(parts) > 1:
             if parts[1] == "W":
-                timeframe = "W"
+                timeframe = "w"
             elif parts[1] == "M":
-                timeframe = "M"
+                timeframe = "m"
 
-        # Auto format crypto
+        # Auto-format crypto
         if ticker.endswith("USD") and not ticker.startswith("$"):
             ticker = f"${ticker}"
 
-        if timeframe == "D":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=D&i=t375773&r=7200"
+        if timeframe == "d":
+            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=d&i=t375773&r=7200"
             title = "Daily"
 
-        elif timeframe == "W":
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=W&yr=2&i=t375773&r=7200"
+        elif timeframe == "w":
+            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=w&yr=2&i=t375773&r=7200"
             title = "Weekly"
 
         else:
-            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=M&i=t375773&r=7200"
+            chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p=m&i=t375773&r=7200"
             title = "Monthly"
 
         embed = discord.Embed(title=f"{ticker} Chart ({title})")
