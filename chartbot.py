@@ -43,4 +43,23 @@ async def on_message(message):
         "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
     }
 
-    tit
+    title = "Weekly" if timeframe == "W" else "Daily"
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(chart_url, headers=headers) as resp:
+                content_type = resp.headers.get("Content-Type", "")
+                if resp.status != 200 or "image" not in content_type:
+                    await message.channel.send(f"StockCharts blocked the request for `{ticker}` (status {resp.status}).")
+                    return
+                image_data = await resp.read()
+
+        file = discord.File(fp=io.BytesIO(image_data), filename=f"{ticker}.png")
+        embed = discord.Embed(title=f"{ticker} Chart ({title})")
+        embed.set_image(url=f"attachment://{ticker}.png")
+        await message.channel.send(file=file, embed=embed)
+
+    except Exception as e:
+        await message.channel.send(f"Error fetching chart: {e}")
+
+client.run(TOKEN)
