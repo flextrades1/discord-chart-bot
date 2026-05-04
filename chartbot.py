@@ -1,6 +1,7 @@
 import discord
 import os
 import time
+import aiohttp
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -25,18 +26,22 @@ async def on_message(message):
         return
 
     ticker = parts[0]
-    timeframe = "d"
+    timeframe = "D"
 
     if len(parts) > 1 and parts[1].upper() == "W":
-        timeframe = "w"
+        timeframe = "W"
 
-    chart_url = f"https://finviz.com/chart.ashx?t={ticker}&ty=c&ta=1&p={timeframe}&r={int(time.time())}"
+    chart_url = (
+        f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}"
+        f"&i=t375773&r={int(time.time())}"
+    )
 
-    title = "Weekly" if timeframe == "w" else "Daily"
+    headers = {
+        "Referer": "https://stockcharts.com/",
+        "User-Agent": "Mozilla/5.0"
+    }
 
-    embed = discord.Embed(title=f"{ticker} Chart ({title})")
-    embed.set_image(url=chart_url)
+    title = "Weekly" if timeframe == "W" else "Daily"
 
-    await message.channel.send(embed=embed)
-
-client.run(TOKEN)
+    async with aiohttp.ClientSession() as session:
+        async wi
