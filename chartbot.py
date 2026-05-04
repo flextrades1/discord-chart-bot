@@ -1,8 +1,5 @@
 import discord
 import os
-import aiohttp
-import io
-import time
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -34,42 +31,25 @@ async def on_message(message):
     ticker = parts[0]
     timeframe = "D"
 
-    if len(parts) > 1:
-        if parts[1] == "W":
-            timeframe = "W"
-        elif parts[1] == "M":
-            timeframe = "M"
+    if len(parts) > 1 and parts[1] == "W":
+        timeframe = "W"
 
     # crypto formatting
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
+    # reliability fix (unique URL every request)
+    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={__import__('time').time()}"
+
     if timeframe == "W":
         title = "Weekly"
-    elif timeframe == "M":
-        title = "Monthly"
     else:
         title = "Daily"
 
-    # retry logic (THIS is what fixes your issue)
-    for attempt in range(3):
-        chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={time.time()}"
+    embed = discord.Embed(title=f"{ticker} Chart ({title})")
+    embed.set_image(url=chart_url)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(chart_url) as resp:
-                if resp.status == 200:
-                    data = await resp.read()
-
-                    file = discord.File(io.BytesIO(data), filename="chart.png")
-                    embed = discord.Embed(title=f"{ticker} Chart ({title})")
-                    embed.set_image(url="attachment://chart.png")
-
-                    await message.channel.send(file=file, embed=embed)
-                    return
-
-        await asyncio.sleep(0.5)
-
-    await message.channel.send(f"Failed to load chart for {ticker}. Try again.")
+    await message.channel.send(embed=embed)
 
 
 client.run(TOKEN)
