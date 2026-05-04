@@ -1,9 +1,5 @@
 import discord
 import os
-import aiohttp
-import io
-import time
-import asyncio
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -42,32 +38,18 @@ async def on_message(message):
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    title = "Weekly" if timeframe == "W" else "Daily"
+    # reliability fix (unique URL every request)
+    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={__import__('time').time()}"
 
-    for attempt in range(3):
-        chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={time.time()}"
+    if timeframe == "W":
+        title = "Weekly"
+    else:
+        title = "Daily"
 
-        try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(chart_url, timeout=10) as resp:
-                    if resp.status == 200:
-                        data = await resp.read()
+    embed = discord.Embed(title=f"{ticker} Chart ({title})")
+    embed.set_image(url=chart_url)
 
-                        file = discord.File(io.BytesIO(data), filename="chart.png")
-                        embed = discord.Embed(title=f"{ticker} Chart ({title})")
-                        embed.set_image(url="attachment://chart.png")
-
-                        await message.channel.send(file=file, embed=embed)
-                        return
-                    else:
-                        print(f"StockCharts returned status {resp.status}")
-
-        except Exception as e:
-            print(f"Chart load failed on attempt {attempt + 1}: {e}")
-
-        await asyncio.sleep(1)
-
-    await message.channel.send(f"{ticker} chart failed to load. Try again.")
+    await message.channel.send(embed=embed)
 
 
 client.run(TOKEN)
