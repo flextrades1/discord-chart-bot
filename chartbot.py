@@ -1,22 +1,19 @@
 import discord
 import os
+import time
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
-
 client = discord.Client(intents=intents)
-
 
 @client.event
 async def on_ready():
     print("Bot is online!")
 
-
 @client.event
 async def on_message(message):
-
     if message.author == client.user:
         return
 
@@ -24,7 +21,6 @@ async def on_message(message):
         return
 
     parts = message.content[2:].strip().upper().split()
-
     if len(parts) == 0:
         return
 
@@ -34,22 +30,17 @@ async def on_message(message):
     if len(parts) > 1 and parts[1] == "W":
         timeframe = "W"
 
-    # crypto formatting
     if ticker.endswith("USD") and not ticker.startswith("$"):
         ticker = f"${ticker}"
 
-    # reliability fix (unique URL every request)
-    chart_url = f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}&i=t375773&r={__import__('time').time()}"
+    chart_url = (
+        f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}"
+        f"&i=t375773&r={int(time.time())}"
+    )
 
-    if timeframe == "W":
-        title = "Weekly"
-    else:
-        title = "Daily"
+    title = "Weekly" if timeframe == "W" else "Daily"
 
     embed = discord.Embed(title=f"{ticker} Chart ({title})")
     embed.set_image(url=chart_url)
 
-    await message.channel.send(embed=embed)
-
-
-client.run(TOKEN)
+    awa
