@@ -25,22 +25,18 @@ async def on_message(message):
         return
 
     ticker = parts[0]
-    timeframe = "D"
+    timeframe = "d"
 
-    if len(parts) > 1 and parts[1] == "W":
-        timeframe = "W"
+    if len(parts) > 1 and parts[1].upper() == "W":
+        timeframe = "w"
 
-    if ticker.endswith("USD") and not ticker.startswith("$"):
-        ticker = f"${ticker}"
+    chart_url = f"https://finviz.com/chart.ashx?t={ticker}&ty=c&ta=1&p={timeframe}&r={int(time.time())}"
 
-    chart_url = (
-        f"https://stockcharts.com/c-sc/sc?s={ticker}&p={timeframe}"
-        f"&i=t375773&r={int(time.time())}"
-    )
-
-    title = "Weekly" if timeframe == "W" else "Daily"
+    title = "Weekly" if timeframe == "w" else "Daily"
 
     embed = discord.Embed(title=f"{ticker} Chart ({title})")
     embed.set_image(url=chart_url)
 
-    awa
+    await message.channel.send(embed=embed)
+
+client.run(TOKEN)
