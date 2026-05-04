@@ -2,6 +2,7 @@ import discord
 import os
 import time
 import aiohttp
+import io
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -44,4 +45,15 @@ async def on_message(message):
     title = "Weekly" if timeframe == "W" else "Daily"
 
     async with aiohttp.ClientSession() as session:
-        async wi
+        async with session.get(chart_url, headers=headers) as resp:
+            if resp.status != 200:
+                await message.channel.send(f"Could not fetch chart for `{ticker}`.")
+                return
+            image_data = await resp.read()
+
+    file = discord.File(fp=io.BytesIO(image_data), filename=f"{ticker}.png")
+    embed = discord.Embed(title=f"{ticker} Chart ({title})")
+    embed.set_image(url=f"attachment://{ticker}.png")
+    await message.channel.send(file=file, embed=embed)
+
+client.run(TOKEN)
